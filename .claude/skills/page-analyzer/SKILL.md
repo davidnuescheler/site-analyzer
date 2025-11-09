@@ -17,6 +17,7 @@ Analyze a website URL to extract main content areas, sections, and identify bloc
      - Large background images with h1 headings
      - Hero-style content positioned above the first explicit section
    - For article/content pages without explicit sections, treat the main content area as a single implicit section
+   - **Always exclude footer content**: Do not analyze or include `<footer>` tags or footer-related elements (elements with classes/ids containing "footer") in your section breakdown
 3. **Summarize sections**: For each section found, provide a summary of its purpose and content as well as a querySelector to identify the section.
 4. **Identify blocks inside sections**: Based on https://www.aem.live/developer/markup-sections-blocks and https://www.aem.live/developer/block-collection, identify:
    - Common blocks (hero, columns, cards, carousel, mosaic, etc.)
@@ -32,13 +33,14 @@ Analyze a website URL to extract main content areas, sections, and identify bloc
 
    Guidelines:
    - For each section, display: `Section: <name or heading summary>` (prefer heading/h1/h2 text if available for clarity, otherwise use ID or name attribute)
-   - Include a single querySelector for easy identification: `querySelector: <selector>`
+   - Include a single querySelector for easy identification: `querySelector: <selector>` - **always wrap the selector in backticks** to prevent markdown formatting issues with special characters like underscores
    - Next line: `Blocks: <block1>, <block2>, <block3>`
    - **querySelector best practices**:
-     - Prefer IDs when available (e.g., `section#facts` instead of `section[id="facts"]`)
-     - Use simplified class selectors (e.g., `section.img.blue` instead of `section[class*="img blue"]`)
+     - Prefer IDs when available (e.g., `` `section#facts` `` instead of `section[id="facts"]`)
+     - Use simplified class selectors (e.g., `` `section.img.blue` `` instead of `section[class*="img blue"]`)
      - Avoid using attribute selectors with wildcards like `[class*=]` - use direct class selectors instead
-     - Chain multiple classes when needed (e.g., `.vucontainer-container.blue` for elements with both classes)
+     - Chain multiple classes when needed (e.g., `` `.vucontainer-container.blue` `` for elements with both classes)
+     - Always wrap selectors containing underscores or other special characters in backticks (e.g., `` `div#container-layout-_-1156700515` ``)
    - Use full block names with variants (e.g., `columns (two)`, `cards (featured)`, `links`, `callout (cta)`, `carousel`)
      - Keep variant values simple and concise (e.g., `columns (three)` not `columns (three, repeated twice for 6 items total)`)
      - Variants should describe the block type, not the layout complexity or repetition
@@ -180,6 +182,7 @@ Pages without explicit `<section>` tags often follow an article or content page 
 
 ## Key Considerations
 
+- **Exclude footer sections**: Never include `<footer>` elements or any footer-related content (classes/ids containing "footer") in your analysis. Only analyze main page content.
 - Focus on DOM structure (parent-child relationships and sibling elements) rather than CSS class names
 - **Columns**: Multiple sibling elements arranged side-by-side, all visible simultaneously. Each column contains distinct content topics
 - **Cards**: Multiple sibling elements in a uniform grid/list layout, all visible simultaneously. Each card has similar structure with title + description + optional link
