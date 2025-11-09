@@ -17,50 +17,71 @@ Analyze a website URL to extract main content areas, sections, and identify bloc
    - Common blocks (hero, columns, cards, carousel, mosaic, etc.)
    - Default content elements (headings, text, images)
    - Block variants (e.g., columns with 2 or 3 variants, cards with featured/simple/link variants)
-5. **Output structured analysis**: Provide a consistent breakdown of sections and their constituent blocks. Format:
-   - For each section, display: `Section: <name/querySelector>`
+5. **Output structured analysis**: Provide a consistent breakdown of sections and their constituent blocks. Format STRICTLY as follows (one section per block of output):
+
+   ```
+   Section: <name or heading summary>
+   querySelector: <selector>
+   Blocks: <block1>, <block2>, <block3>
+   ```
+
+   Guidelines:
+   - For each section, display: `Section: <name or heading summary>` (prefer heading/h1/h2 text if available for clarity, otherwise use ID or name attribute)
+   - Include a single querySelector for easy identification: `querySelector: <selector>`
    - Next line: `Blocks: <block1>, <block2>, <block3>`
    - Use full block names with variants (e.g., `columns (two)`, `cards (featured)`, `links`, `callout (cta)`, `carousel`)
+   - Do not include default content elements (text, image, heading) as separate blocks - only include named block types
+   - If a section contains only default content elements with no named blocks, write: `Blocks: default content`
    - Do not number the blocks, just list them comma-separated in order they appear
    - Apply this same format for all sections: explicit `<section>` tags, implicit content areas, sidebars, all treated uniformly
+   - Include implicit hero sections that appear above the first explicit section (with video/image backgrounds and h1 headings)
+   - Separate each section's output block with a blank line
+   - Do NOT add any other commentary, explanation, or analysis beyond these three lines per section
 
 ## Block Detection Patterns
 
 ### Columns Block Detection
 Detect by structural DOM layout, not CSS classes:
 - Look for **multiple sibling container elements** at the same nesting level within a section
-- Each sibling contains distinct content (text blocks, images, statistics, etc.)
+- **Key distinction from cards**: Columns contain semantically distinct content (different topics/purposes), while cards are structurally identical repeating items
+- Each sibling contains distinct content (text blocks, images, statistics, etc.) on different topics
 - The siblings are arranged horizontally/side-by-side visually or stacked vertically with equal visual weight
 - Count the number of distinct column children to determine variant:
   - 2 sibling columns = `columns (two)`
   - 3 sibling columns = `columns (three)`
   - 4 sibling columns = `columns (four)`
-- Key indicator: A section header followed by N distinct content blocks arranged in parallel
+- **For multi-row layouts**: If the same columns pattern repeats across multiple rows (e.g., 3 columns in row 1, 3 columns in row 2, 3 columns in row 3), treat it as a single `columns` block with the column count based on the pattern per row, not duplicate the block for each row
+- Key indicator: A section header followed by N distinct content blocks (different topics) arranged in parallel
+- **Critical distinction from cards**: Look at the *internal structure* of each sibling, not the wrapper classes. If all siblings have identical internal structure (same child elements in same order), treat as cards instead
 - Common patterns:
   - Multiple text blocks with centered content (statistics, facts, key information)
-  - Image + text layout
-  - Multiple cards or text blocks with identical structure
+  - Image + text layout with different topics in each column
+  - Grid layouts that repeat the same column structure across multiple rows with different topics
+- **NOT columns if**: All items follow identical structure with the same child elements (image + title + description + button, etc.) - these are cards instead
 - Look within each section for this sibling container pattern
 
 ### Cards Block Detection
 Detect by identifying repeated similar sibling elements with consistent structure:
 - Look for **multiple sibling containers** that repeat the same structural pattern
+- **Key distinction from columns**: Cards are structurally identical repeating items, while columns contain semantically distinct content
 - Each card/item typically contains a combination of:
   - A title/heading or link
   - Description text or excerpt
   - An image
   - Optional clickable/action button or link behavior
-- Key structural indicator: **Repeated sibling elements** with identical internal structure (e.g., all have image + text + link, or all have title + description + button)
+- Key structural indicator: **Repeated sibling elements** with identical/near-identical internal structure (e.g., all have image + text + link, or all have title + description + button)
 - The repetition and similarity of structure indicates a card pattern, regardless of the specific container type or naming
-- Cards are designed to be scanned visually as a group, all visible simultaneously
+- Cards are designed to be scanned visually as a group, all visible simultaneously (grid or list layout)
+- **Examples of cards**: "Ways to Give" options with identical structure (title + description + button), portfolio items, team member profiles, service offerings, etc.
 
 #### Cards Variant Naming
 Identify card variants based on their primary structural/visual components:
-- **`cards (featured)`** - Cards with: image + title + description + link/button. The image is a prominent visual element
-- **`cards (simple)`** - Cards with: title + description (no image) + link/button. Minimal structure focused on text content
+- **`cards (featured)`** - Cards with: image + title + description + link/button. The image is a prominent visual element (may be displayed at top, side, or as background). Description content may be expanded/collapsed or always visible
+- **`cards (simple)`** - Cards with: title + description (no image) + link/button. Minimal structure focused on text content only
 - **`cards (link)`** - Cards with: title/link only (minimal). No description or other content, just a heading with link behavior
 - Use these variant names to distinguish cards by their visual complexity and content emphasis
 - If cards are visually and structurally similar (e.g., both have title + description + button), use the same variant name even if the implementation differs
+- The presence of an image is the primary differentiator between featured and simple variants, regardless of how the description content is displayed
 
 ### Carousel Block Detection
 Detect by structural DOM layout indicating sequential/sliding content:
@@ -73,6 +94,23 @@ Detect by structural DOM layout indicating sequential/sliding content:
   - Implies horizontal scrolling or fade/slide transitions
   - May have explicit carousel/slider container with multiple content items
 - Carousel variants typically don't have a numbered designation like columns
+
+### Grid/Masonry Block Detection
+Detect grid or masonry layouts by structural DOM layout:
+- Look for a **parent container with a grid-like class pattern** (e.g., `masonry-wrapper`, `grid-container`) containing **multiple similar sibling box/item elements**
+- Each item/box element typically contains:
+  - An image or background image as primary visual
+  - A heading/title overlay or linked content
+  - Optional description or metadata
+- **Key distinction from cards**: Grid/masonry items are displayed in a responsive grid layout with variable sizing/positioning (often using CSS Grid or Masonry library), whereas cards are in a uniform grid
+- The items are designed to fill space efficiently in a grid arrangement
+- Key structural indicators:
+  - Parent container with class names like `masonry`, `grid`, `gallery`, or similar wrapper patterns
+  - Sibling elements with classes like `box`, `item`, `tile`, or similar consistent naming
+  - Each sibling has identical/similar structure (image + heading + optional link)
+  - Layout is responsive and items may reflow/reposition based on available space
+- Variants: Typically no numbered designation, but may be noted if there's a specific visual pattern
+- **Examples**: Portfolio galleries, image galleries with overlaid titles, product grids, research/project showcases
 
 ### Link Block / Navigation Block Detection
 - A list of links organized as a block
@@ -132,7 +170,8 @@ Pages without explicit `<section>` tags often follow an article or content page 
 
 - Focus on DOM structure (parent-child relationships and sibling elements) rather than CSS class names
 - **Columns**: Multiple sibling elements arranged side-by-side, all visible simultaneously. Each column contains distinct content topics
-- **Cards**: Multiple sibling elements in a grid/list layout, all visible simultaneously. Each card has similar structure with title + description + optional link
+- **Cards**: Multiple sibling elements in a uniform grid/list layout, all visible simultaneously. Each card has similar structure with title + description + optional link
+- **Grid/Masonry**: Multiple sibling elements in a responsive grid layout with variable sizing/positioning, designed to fill space efficiently. Items are displayed simultaneously in a flexible layout
 - **Carousel**: Multiple sibling elements within a sliding/scrolling container, designed to be viewed sequentially/one-at-a-time. Items have identical structure but different content
 - **Default Content**: Single or minimal content elements without repetitive sibling structures
 - **Article/Content Pages**: Look for pages without explicit `<section>` tags. These typically have a multi-column layout with:
@@ -141,5 +180,8 @@ Pages without explicit `<section>` tags often follow an article or content page 
 - **Sidebars as Implicit Sections**: Treat sidebars/widget columns as separate implicit sections and identify the blocks within them (links, callouts, etc.)
 - Sections often contain just a single block with optional default content (heading) above it
 - Pay attention to visual hierarchy and how content is arranged, not styling classes
-- Key distinction: Columns and Cards are **spatial** (visible together), while Carousel is **temporal** (viewed one at a time)
+- Key distinctions:
+  - **Columns vs Cards**: Columns have semantically distinct content in parallel; cards are structurally identical items
+  - **Cards vs Grid/Masonry**: Cards use uniform grid sizing; grid/masonry use variable sizing and flexible repositioning
+  - **Spatial vs Temporal**: Columns, Cards, and Grid/Masonry are spatial (visible together), while Carousel is temporal (viewed one at a time)
 - For article pages with implicit sections: treat the main content area as one section with "Default content", and treat the sidebar as another implicit section with identified blocks (link blocks, callouts, etc.)
