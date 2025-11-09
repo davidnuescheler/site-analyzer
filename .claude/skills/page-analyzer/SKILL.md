@@ -34,7 +34,14 @@ Analyze a website URL to extract main content areas, sections, and identify bloc
    - For each section, display: `Section: <name or heading summary>` (prefer heading/h1/h2 text if available for clarity, otherwise use ID or name attribute)
    - Include a single querySelector for easy identification: `querySelector: <selector>`
    - Next line: `Blocks: <block1>, <block2>, <block3>`
+   - **querySelector best practices**:
+     - Prefer IDs when available (e.g., `section#facts` instead of `section[id="facts"]`)
+     - Use simplified class selectors (e.g., `section.img.blue` instead of `section[class*="img blue"]`)
+     - Avoid using attribute selectors with wildcards like `[class*=]` - use direct class selectors instead
+     - Chain multiple classes when needed (e.g., `.vucontainer-container.blue` for elements with both classes)
    - Use full block names with variants (e.g., `columns (two)`, `cards (featured)`, `links`, `callout (cta)`, `carousel`)
+     - Keep variant values simple and concise (e.g., `columns (three)` not `columns (three, repeated twice for 6 items total)`)
+     - Variants should describe the block type, not the layout complexity or repetition
    - Do not include default content elements (text, image, heading) as separate blocks - only include named block types
    - If a section contains only default content elements with no named blocks, write: `Blocks: default content`
    - Do not number the blocks, just list them comma-separated in order they appear
