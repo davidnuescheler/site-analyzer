@@ -1,0 +1,9 @@
+{
+  "skills": [
+    {
+      "name": "page-analyzer",
+      "description": "Analyzes web pages to extract main content areas, sections, and block structure",
+      "file": "skills/page-analyzer.md"
+    }
+  ]
+}
