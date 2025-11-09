@@ -2,8 +2,8 @@
   "skills": [
     {
       "name": "page-analyzer",
-      "description": "Analyzes web pages to extract main content areas, sections, and block structure",
-      "file": "skills/page-analyzer.md"
+      "description": "Analyze website structure and extract main content areas, sections, and identify blocks based on AEM markup. Use when analyzing web pages to understand their content organization, sections, and block structure for site auditing and documentation.",
+      "file": "skills/page-analyzer/SKILL.md"
     }
   ]
 }

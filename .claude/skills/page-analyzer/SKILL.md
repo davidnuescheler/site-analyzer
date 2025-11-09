@@ -1,3 +1,8 @@
+---
+name: page-analyzer
+description: Analyze website structure and extract main content areas, sections, and identify blocks based on AEM markup. Use when analyzing web pages to understand their content organization, sections, and block structure for site auditing and documentation.
+---
+
 # Page Analyzer
 
 Analyze a website URL to extract main content areas, sections, and identify blocks and default content elements based on the AEM markup structure.
