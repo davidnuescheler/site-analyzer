@@ -4,6 +4,11 @@
       "name": "page-analyzer",
       "description": "Analyze website structure and extract main content areas, sections, and identify blocks based on AEM markup. Use when analyzing web pages to understand their content organization, sections, and block structure for site auditing and documentation.",
       "file": "skills/page-analyzer/SKILL.md"
+    },
+    {
+      "name": "screenshot-generator",
+      "description": "Capture block variant screenshots for both mobile and desktop devices using the image-forest service and save them with standardized naming conventions.",
+      "file": "skills/screenshot-generator/SKILL.md"
     }
   ]
 }
